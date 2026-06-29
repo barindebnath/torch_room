@@ -14,6 +14,7 @@ defmodule TorchRoomWeb.TorchComponent do
   - `angles` — list of all valid angles to render as hover targets
   """
   attr :angle, :integer, required: true
+  attr :display_angle, :integer, required: true
   attr :intensity, :integer, required: true
   attr :angles, :list, required: true
 
@@ -23,13 +24,13 @@ defmodule TorchRoomWeb.TorchComponent do
       <%!-- Light cone: opacity driven by intensity --%>
       <div
         class="light-cone"
-        style={"transform: rotate(#{@angle}deg); opacity: #{@intensity / 100};"}
+        style={"transform: rotate(#{@display_angle}deg); opacity: #{@intensity / 100};"}
       />
 
       <%!-- Torch body SVG --%>
       <div
         class="torch-body"
-        style={"transform: rotate(#{@angle}deg);"}
+        style={"transform: rotate(#{@display_angle}deg);"}
       >
         <svg viewBox="0 0 40 40" width="40" height="40" class="flashlight-svg">
           <!-- Metallic Body Handle -->
@@ -62,41 +63,7 @@ defmodule TorchRoomWeb.TorchComponent do
           <circle cx="20" cy="7.5" r="1.5" fill="#ffffff" />
         </svg>
       </div>
-
-      <%!-- Six directional hover targets --%>
-      <div class="torch-targets">
-        <div
-          :for={target_angle <- @angles}
-          id={"target-#{target_angle}"}
-          class={["torch-target", target_angle == @angle && "active"]}
-          style={point_style(target_angle)}
-          phx-hook=".RotateOnHover"
-          phx-value-angle={target_angle}
-        />
-      </div>
-
-      <script :type={Phoenix.LiveView.ColocatedHook} name=".RotateOnHover">
-        export default {
-          mounted() {
-            this.el.addEventListener("mouseenter", () => {
-              let angle = this.el.getAttribute("phx-value-angle")
-              this.pushEvent("rotate", { angle: angle })
-            })
-          }
-        }
-      </script>
     </div>
     """
-  end
-
-  # Positions each target point on a circle around the torch centre.
-  # Returns an inline style string with `top` and `left` offsets.
-  @spec point_style(integer()) :: String.t()
-  defp point_style(angle_deg) do
-    radius = 80
-    angle_rad = angle_deg * :math.pi() / 180
-    x = 50 + radius * :math.sin(angle_rad)
-    y = 50 - radius * :math.cos(angle_rad)
-    "top: #{Float.round(y, 2)}%; left: #{Float.round(x, 2)}%;"
   end
 end

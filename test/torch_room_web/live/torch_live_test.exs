@@ -17,10 +17,10 @@ defmodule TorchRoomWeb.TorchLiveTest do
 
       html =
         view
-        |> element("#target-0")
+        |> element("[phx-value-angle='0']")
         |> render_hook("rotate", %{"angle" => "0"})
 
-      assert html =~ "rotate(0deg)"
+      assert html =~ "rotate(360deg)"
       assert html =~ "opacity: 0.1"
     end
 
@@ -29,7 +29,7 @@ defmodule TorchRoomWeb.TorchLiveTest do
 
       html =
         view
-        |> element("#target-180")
+        |> element("[phx-value-angle='180']")
         |> render_hook("rotate", %{"angle" => "180"})
 
       assert html =~ "opacity: 1"
