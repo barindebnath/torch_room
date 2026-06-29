@@ -4,10 +4,10 @@ defmodule TorchRoomWeb.TorchLiveTest do
   import Phoenix.LiveViewTest
 
   describe "mount" do
-    test "mounts with default angle 180 and intensity 10", %{conn: conn} do
+    test "mounts with default angle 180 and intensity 25", %{conn: conn} do
       {:ok, _view, html} = live(conn, "/")
       assert html =~ "rotate(180deg)"
-      assert html =~ "opacity: 0.1"
+      assert html =~ "opacity: 0.25"
     end
   end
 
@@ -24,7 +24,7 @@ defmodule TorchRoomWeb.TorchLiveTest do
       assert html =~ "opacity: 1"
     end
 
-    test "hovering over 180 degrees zone points to 180 degrees with intensity 10", %{conn: conn} do
+    test "hovering over 180 degrees zone points to 180 degrees with intensity 25", %{conn: conn} do
       {:ok, view, _html} = live(conn, "/")
 
       html =
@@ -33,15 +33,15 @@ defmodule TorchRoomWeb.TorchLiveTest do
         |> render_hook("rotate", %{"angle" => "180"})
 
       assert html =~ "rotate(180deg)"
-      assert html =~ "opacity: 0.1"
+      assert html =~ "opacity: 0.25"
     end
 
     test "ignores invalid angle values", %{conn: conn} do
       {:ok, view, _html} = live(conn, "/")
       html = render_hook(view, "rotate", %{"angle" => "999"})
-      # Socket state remains default (180deg / 10%)
+      # Socket state remains default (180deg / 25%)
       assert html =~ "rotate(180deg)"
-      assert html =~ "opacity: 0.1"
+      assert html =~ "opacity: 0.25"
     end
   end
 end

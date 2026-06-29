@@ -4,8 +4,8 @@ defmodule TorchRoom.TorchTest do
   alias TorchRoom.Torch
 
   describe "intensity/1" do
-    test "returns 10 at 180 degrees (pointing toward viewer)" do
-      assert Torch.intensity(180) == 10
+    test "returns 25 at 180 degrees (pointing toward viewer)" do
+      assert Torch.intensity(180) == 25
     end
 
     test "returns 100 at 0 degrees (pointing away)" do

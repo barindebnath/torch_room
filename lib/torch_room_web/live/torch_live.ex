@@ -112,85 +112,67 @@ defmodule TorchRoomWeb.TorchLive do
               preserveAspectRatio="none"
             >
               <defs>
-                <!-- Wall Gradients (Inside faces) -->
-                <linearGradient id="leftWallGrad" x1="0" y1="0.5" x2="1" y2="0.5">
-                  <stop offset="0%" stop-color="#050512" />
-                  <stop offset="100%" stop-color="#16162d" />
-                </linearGradient>
-                <linearGradient id="rightWallGrad" x1="1" y1="0.5" x2="0" y2="0.5">
-                  <stop offset="0%" stop-color="#050512" />
-                  <stop offset="100%" stop-color="#16162d" />
-                </linearGradient>
-
                 <!-- ── LIGHTING OVERLAY GRADIENTS (Absolute space centered at 400,350) ── -->
                 <radialGradient
                   id="leftWallLight"
                   cx="400"
                   cy="350"
-                  r="300"
+                  r="380"
                   gradientUnits="userSpaceOnUse"
                 >
-                  <stop offset="0%" stop-color="#ffd700" stop-opacity="0.4" />
+                  <stop offset="0%" stop-color="#ffd700" stop-opacity="0.7" />
+                  <stop offset="60%" stop-color="#ffd700" stop-opacity="0.2" />
                   <stop offset="100%" stop-color="#ffd700" stop-opacity="0.0" />
                 </radialGradient>
                 <radialGradient
                   id="rightWallLight"
                   cx="400"
                   cy="350"
-                  r="300"
+                  r="380"
                   gradientUnits="userSpaceOnUse"
                 >
-                  <stop offset="0%" stop-color="#ffd700" stop-opacity="0.4" />
+                  <stop offset="0%" stop-color="#ffd700" stop-opacity="0.7" />
+                  <stop offset="60%" stop-color="#ffd700" stop-opacity="0.2" />
                   <stop offset="100%" stop-color="#ffd700" stop-opacity="0.0" />
                 </radialGradient>
                 <radialGradient
                   id="floorLight"
                   cx="400"
                   cy="350"
-                  r="250"
+                  r="320"
                   gradientUnits="userSpaceOnUse"
                 >
-                  <stop offset="0%" stop-color="#ffd700" stop-opacity="0.45" />
+                  <stop offset="0%" stop-color="#ffd700" stop-opacity="0.75" />
+                  <stop offset="50%" stop-color="#ffd700" stop-opacity="0.25" />
                   <stop offset="100%" stop-color="#ffd700" stop-opacity="0.0" />
                 </radialGradient>
-
-                <!-- Filter to round the outer 3D block corners smoothly -->
-                <filter id="roundCorners" x="-20%" y="-20%" width="140%" height="140%">
-                  <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur" />
-                  <feColorMatrix
-                    in="blur"
-                    mode="matrix"
-                    values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8"
-                    result="goo"
-                  />
-                  <feComposite in="SourceGraphic" in2="goo" operator="atop" />
-                </filter>
               </defs>
 
-              <g filter="url(#roundCorners)">
-                <!-- ── 1. FLOOR SLAB (3D Block) ── -->
-                <!-- Floor Top Face (Extends to outer wall edges) -->
-                <polygon points="130,340 400,230 670,340 400,470" fill="#0c0c1e" />
-                <!-- Floor Front-Left thickness -->
-                <polygon points="130,340 400,470 400,490 130,360" fill="#060610" />
-                <!-- Floor Front-Right thickness -->
-                <polygon points="400,470 670,340 670,360 400,490" fill="#080814" />
+              <!-- ── 1. FLOOR SLAB (3D Block) ── -->
+              <!-- Floor Top Face (Extends to outer wall edges) -->
+              <polygon points="130,340 400,230 670,340 400,470" fill="#0c0c1e" />
+              <!-- Floor Front-Left thickness -->
+              <polygon points="130,340 400,470 400,490 130,360" fill="#060610" />
+              <!-- Floor Front-Right thickness -->
+              <polygon points="400,470 670,340 670,360 400,490" fill="#080814" />
 
-                <!-- ── 2. WALLS (3D Blocks) ── -->
-                <!-- Left Wall Inside Face -->
-                <polygon points="150,350 400,230 400,50 150,170" fill="url(#leftWallGrad)" />
-                <!-- Left Wall Top Face (Thickness) -->
-                <polygon points="150,170 400,50 380,40 130,160" fill="#1c1c38" />
-                <!-- Left Wall Outer Side Face -->
-                <polygon points="130,160 130,340 150,350 150,170" fill="#05050f" />
+              <!-- ── 2. WALLS (3D Blocks) ── -->
+              <!-- Left Wall Inside Face -->
+              <polygon points="150,350 400,230 400,50 150,170" fill="#0e0e22" />
+              <!-- Left Wall Top Face (Thickness) -->
+              <polygon points="150,170 400,50 380,40 130,160" fill="#1c1c38" />
+              <!-- Left Wall Outer Side Face -->
+              <polygon points="130,160 130,340 150,350 150,170" fill="#05050f" />
 
-                <!-- Right Wall Inside Face -->
-                <polygon points="400,230 650,350 650,170 400,50" fill="url(#rightWallGrad)" />
-                <!-- Right Wall Top Face (Thickness) -->
-                <polygon points="650,170 400,50 420,40 670,160" fill="#1c1c38" />
-                <!-- Right Wall Outer Side Face -->
-                <polygon points="670,160 670,340 650,350 650,170" fill="#05050f" />
-              </g>
+              <!-- Right Wall Inside Face -->
+              <polygon points="400,230 650,350 650,170 400,50" fill="#0e0e22" />
+              <!-- Right Wall Top Face (Thickness) -->
+              <polygon points="650,170 400,50 420,40 670,160" fill="#1c1c38" />
+              <!-- Right Wall Outer Side Face -->
+              <polygon points="670,160 670,340 650,350 650,170" fill="#05050f" />
+
+              <!-- Top Corner Diamond Capstone -->
+              <polygon points="400,30 420,40 400,50 380,40" fill="#1c1c38" />
 
               <!-- ── 3. INTERACTIVE LIGHTING OVERLAYS (Reactive) ── -->
               <!-- Floor Light overlay -->
