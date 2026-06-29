@@ -14,15 +14,14 @@ COPY config/config.exs config/prod.exs config/runtime.exs config/
 COPY lib lib
 COPY priv priv
 COPY assets assets
+COPY rel rel
 
-RUN mix assets.deploy
 RUN mix compile
+RUN mix assets.deploy
 RUN mix release
 
 # ---- Runtime stage ----
-FROM alpine:3.19 AS runtime
-
-RUN apk add --no-cache libstdc++ openssl ncurses-libs
+FROM elixir:1.16-otp-26-alpine AS runtime
 
 WORKDIR /app
 
@@ -31,4 +30,4 @@ COPY --from=build /app/_build/prod/rel/torch_room ./
 ENV HOME=/app
 EXPOSE 4000
 
-CMD ["bin/torch_room", "start"]
+CMD ["bin/server"]
