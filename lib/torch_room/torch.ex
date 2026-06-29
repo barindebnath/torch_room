@@ -20,11 +20,11 @@ defmodule TorchRoom.Torch do
   and dims as it rotates away.
   """
   @spec intensity(angle()) :: intensity()
-  def intensity(0), do: 10
-  def intensity(60), do: 30
-  def intensity(120), do: 60
-  def intensity(180), do: 100
-  def intensity(240), do: 60
-  def intensity(300), do: 30
+  def intensity(0), do: 100
+  def intensity(60), do: 60
+  def intensity(120), do: 30
+  def intensity(180), do: 10
+  def intensity(240), do: 30
+  def intensity(300), do: 60
   def intensity(_), do: 0
 end

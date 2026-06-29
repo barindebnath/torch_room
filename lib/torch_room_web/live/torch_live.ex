@@ -29,7 +29,8 @@ defmodule TorchRoomWeb.TorchLive do
           {:noreply, Phoenix.LiveView.Socket.t()}
   def handle_event("rotate", %{"angle" => raw_angle}, socket) do
     case Integer.parse(raw_angle) do
-      {target_angle, ""} when target_angle in [0, 60, 120, 180, 240, 300] ->
+      {hovered_angle, ""} when hovered_angle in [0, 60, 120, 180, 240, 300] ->
+        target_angle = hovered_angle
         current_display_angle = socket.assigns.display_angle
         new_display_angle = shortest_path_angle(current_display_angle, target_angle)
 
@@ -113,12 +114,12 @@ defmodule TorchRoomWeb.TorchLive do
               <defs>
                 <!-- Wall Gradients (Inside faces) -->
                 <linearGradient id="leftWallGrad" x1="0" y1="0.5" x2="1" y2="0.5">
-                  <stop offset="0%" stop-color="#020205" />
-                  <stop offset="100%" stop-color="#080810" />
+                  <stop offset="0%" stop-color="#050512" />
+                  <stop offset="100%" stop-color="#16162d" />
                 </linearGradient>
                 <linearGradient id="rightWallGrad" x1="1" y1="0.5" x2="0" y2="0.5">
-                  <stop offset="0%" stop-color="#020205" />
-                  <stop offset="100%" stop-color="#080810" />
+                  <stop offset="0%" stop-color="#050512" />
+                  <stop offset="100%" stop-color="#16162d" />
                 </linearGradient>
 
                 <!-- ── LIGHTING OVERLAY GRADIENTS (Absolute space centered at 400,350) ── -->
@@ -152,202 +153,67 @@ defmodule TorchRoomWeb.TorchLive do
                   <stop offset="0%" stop-color="#ffd700" stop-opacity="0.45" />
                   <stop offset="100%" stop-color="#ffd700" stop-opacity="0.0" />
                 </radialGradient>
+
+                <!-- Filter to round the outer 3D block corners smoothly -->
+                <filter id="roundCorners" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur" />
+                  <feColorMatrix
+                    in="blur"
+                    mode="matrix"
+                    values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8"
+                    result="goo"
+                  />
+                  <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+                </filter>
               </defs>
 
-              <!-- ── 1. FLOOR SLAB (3D Block) ── -->
-              <!-- Floor Top Face -->
-              <polygon points="150,350 400,230 650,350 400,470" fill="#0c0c16" />
-              <!-- Floor Front-Left thickness -->
-              <polygon points="150,350 400,470 400,490 150,370" fill="#06060c" />
-              <!-- Floor Front-Right thickness -->
-              <polygon points="400,470 650,350 650,370 400,490" fill="#080812" />
+              <g filter="url(#roundCorners)">
+                <!-- ── 1. FLOOR SLAB (3D Block) ── -->
+                <!-- Floor Top Face (Extends to outer wall edges) -->
+                <polygon points="130,340 400,230 670,340 400,470" fill="#0c0c1e" />
+                <!-- Floor Front-Left thickness -->
+                <polygon points="130,340 400,470 400,490 130,360" fill="#060610" />
+                <!-- Floor Front-Right thickness -->
+                <polygon points="400,470 670,340 670,360 400,490" fill="#080814" />
 
-              <!-- ── 2. WALLS (3D Blocks) ── -->
-              <!-- Left Wall Inside Face -->
-              <polygon points="150,350 400,230 400,50 150,170" fill="url(#leftWallGrad)" />
-              <!-- Left Wall Top Face (Thickness) -->
-              <polygon points="150,170 400,50 380,40 130,160" fill="#141424" />
-              <!-- Left Wall Outer Side Face -->
-              <polygon points="130,160 130,340 150,350 150,170" fill="#040408" />
+                <!-- ── 2. WALLS (3D Blocks) ── -->
+                <!-- Left Wall Inside Face -->
+                <polygon points="150,350 400,230 400,50 150,170" fill="url(#leftWallGrad)" />
+                <!-- Left Wall Top Face (Thickness) -->
+                <polygon points="150,170 400,50 380,40 130,160" fill="#1c1c38" />
+                <!-- Left Wall Outer Side Face -->
+                <polygon points="130,160 130,340 150,350 150,170" fill="#05050f" />
 
-              <!-- Right Wall Inside Face -->
-              <polygon points="400,230 650,350 650,170 400,50" fill="url(#rightWallGrad)" />
-              <!-- Right Wall Top Face (Thickness) -->
-              <polygon points="650,170 400,50 420,40 670,160" fill="#141424" />
-              <!-- Right Wall Outer Side Face -->
-              <polygon points="670,160 670,340 650,350 650,170" fill="#040408" />
+                <!-- Right Wall Inside Face -->
+                <polygon points="400,230 650,350 650,170 400,50" fill="url(#rightWallGrad)" />
+                <!-- Right Wall Top Face (Thickness) -->
+                <polygon points="650,170 400,50 420,40 670,160" fill="#1c1c38" />
+                <!-- Right Wall Outer Side Face -->
+                <polygon points="670,160 670,340 650,350 650,170" fill="#05050f" />
+              </g>
 
               <!-- ── 3. INTERACTIVE LIGHTING OVERLAYS (Reactive) ── -->
               <!-- Floor Light overlay -->
               <polygon
                 points="150,350 400,230 650,350 400,470"
                 fill="url(#floorLight)"
-                opacity={wall_opacity(:floor, @angle)}
+                opacity={wall_opacity(:floor, @angle) * (@intensity / 100)}
                 style="transition: opacity 0.4s ease-in-out; pointer-events: none;"
               />
               <!-- Left Wall Light overlay -->
               <polygon
                 points="150,350 400,230 400,50 150,170"
                 fill="url(#leftWallLight)"
-                opacity={wall_opacity(:left_wall, @angle)}
+                opacity={wall_opacity(:left_wall, @angle) * (@intensity / 100)}
                 style="transition: opacity 0.4s ease-in-out; pointer-events: none;"
               />
               <!-- Right Wall Light overlay -->
               <polygon
                 points="400,230 650,350 650,170 400,50"
                 fill="url(#rightWallLight)"
-                opacity={wall_opacity(:right_wall, @angle)}
+                opacity={wall_opacity(:right_wall, @angle) * (@intensity / 100)}
                 style="transition: opacity 0.4s ease-in-out; pointer-events: none;"
               />
-
-              <!-- ── 4. OUTLINE EDGE LINES (3D Details) ── -->
-              <!-- Junction lines (Inside corners) -->
-              <line x1="400" y1="230" x2="400" y2="50" stroke="#1f1f2e" stroke-width="1.5" />
-              <line x1="150" y1="350" x2="400" y2="230" stroke="#1c1c2a" stroke-width="1" />
-              <line x1="650" y1="350" x2="400" y2="230" stroke="#1c1c2a" stroke-width="1" />
-
-              <!-- Outer/Top edges -->
-              <line x1="150" y1="170" x2="400" y2="50" stroke="#252538" stroke-width="1" />
-              <line x1="650" y1="170" x2="400" y2="50" stroke="#252538" stroke-width="1" />
-
-              <!-- ── 4.5. 2D FLAT TARGET DECALS ── -->
-              <!-- Upper Left Wall Target (300°) -->
-              <g class="target-decal">
-                <circle
-                  cx="275"
-                  cy="155"
-                  r="8"
-                  fill="none"
-                  stroke={if @angle == 300, do: "#ffd700", else: "#484860"}
-                  stroke-width="1.2"
-                  stroke-dasharray="2,2"
-                  opacity={if @angle == 300, do: "0.9", else: "0.4"}
-                  style="transition: stroke 0.4s ease, opacity 0.4s ease;"
-                />
-                <circle
-                  cx="275"
-                  cy="155"
-                  r="3"
-                  fill={if @angle == 300, do: "#ffd700", else: "#35354a"}
-                  opacity={if @angle == 300, do: "1.0", else: "0.5"}
-                  style="transition: fill 0.4s ease, opacity 0.4s ease;"
-                />
-              </g>
-
-              <!-- Lower Left Wall Target (240°) -->
-              <g class="target-decal">
-                <circle
-                  cx="275"
-                  cy="245"
-                  r="8"
-                  fill="none"
-                  stroke={if @angle == 240, do: "#ffd700", else: "#484860"}
-                  stroke-width="1.2"
-                  stroke-dasharray="2,2"
-                  opacity={if @angle == 240, do: "0.9", else: "0.4"}
-                  style="transition: stroke 0.4s ease, opacity 0.4s ease;"
-                />
-                <circle
-                  cx="275"
-                  cy="245"
-                  r="3"
-                  fill={if @angle == 240, do: "#ffd700", else: "#35354a"}
-                  opacity={if @angle == 240, do: "1.0", else: "0.5"}
-                  style="transition: fill 0.4s ease, opacity 0.4s ease;"
-                />
-              </g>
-
-              <!-- Upper Right Wall Target (60°) -->
-              <g class="target-decal">
-                <circle
-                  cx="525"
-                  cy="155"
-                  r="8"
-                  fill="none"
-                  stroke={if @angle == 60, do: "#ffd700", else: "#484860"}
-                  stroke-width="1.2"
-                  stroke-dasharray="2,2"
-                  opacity={if @angle == 60, do: "0.9", else: "0.4"}
-                  style="transition: stroke 0.4s ease, opacity 0.4s ease;"
-                />
-                <circle
-                  cx="525"
-                  cy="155"
-                  r="3"
-                  fill={if @angle == 60, do: "#ffd700", else: "#35354a"}
-                  opacity={if @angle == 60, do: "1.0", else: "0.5"}
-                  style="transition: fill 0.4s ease, opacity 0.4s ease;"
-                />
-              </g>
-
-              <!-- Lower Right Wall Target (120°) -->
-              <g class="target-decal">
-                <circle
-                  cx="525"
-                  cy="245"
-                  r="8"
-                  fill="none"
-                  stroke={if @angle == 120, do: "#ffd700", else: "#484860"}
-                  stroke-width="1.2"
-                  stroke-dasharray="2,2"
-                  opacity={if @angle == 120, do: "0.9", else: "0.4"}
-                  style="transition: stroke 0.4s ease, opacity 0.4s ease;"
-                />
-                <circle
-                  cx="525"
-                  cy="245"
-                  r="3"
-                  fill={if @angle == 120, do: "#ffd700", else: "#35354a"}
-                  opacity={if @angle == 120, do: "1.0", else: "0.5"}
-                  style="transition: fill 0.4s ease, opacity 0.4s ease;"
-                />
-              </g>
-
-              <!-- Back Floor Target (0°) -->
-              <g class="target-decal">
-                <circle
-                  cx="400"
-                  cy="310"
-                  r="8"
-                  fill="none"
-                  stroke={if @angle == 0, do: "#ffd700", else: "#484860"}
-                  stroke-width="1.2"
-                  stroke-dasharray="2,2"
-                  opacity={if @angle == 0, do: "0.9", else: "0.4"}
-                  style="transition: stroke 0.4s ease, opacity 0.4s ease;"
-                />
-                <circle
-                  cx="400"
-                  cy="310"
-                  r="3"
-                  fill={if @angle == 0, do: "#ffd700", else: "#35354a"}
-                  opacity={if @angle == 0, do: "1.0", else: "0.5"}
-                  style="transition: fill 0.4s ease, opacity 0.4s ease;"
-                />
-              </g>
-
-              <!-- Front Floor Target (180°) -->
-              <g class="target-decal">
-                <circle
-                  cx="400"
-                  cy="410"
-                  r="8"
-                  fill="none"
-                  stroke={if @angle == 180, do: "#ffd700", else: "#484860"}
-                  stroke-width="1.2"
-                  stroke-dasharray="2,2"
-                  opacity={if @angle == 180, do: "0.9", else: "0.4"}
-                  style="transition: stroke 0.4s ease, opacity 0.4s ease;"
-                />
-                <circle
-                  cx="400"
-                  cy="410"
-                  r="3"
-                  fill={if @angle == 180, do: "#ffd700", else: "#35354a"}
-                  opacity={if @angle == 180, do: "1.0", else: "0.5"}
-                  style="transition: fill 0.4s ease, opacity 0.4s ease;"
-                />
-              </g>
 
               <!-- ── 5. TRANSPARENT HOVER ZONES (OVERLAYS) ── -->
               <!-- Upper Left Wall Zone (300°) -->
@@ -418,17 +284,6 @@ defmodule TorchRoomWeb.TorchLive do
               intensity={@intensity}
               angles={@angles}
             />
-          </div>
-        </div>
-
-        <div class="torch-dashboard">
-          <div class="dashboard-stat">
-            <span class="stat-label">Angle</span>
-            <span class="stat-value">{@angle}°</span>
-          </div>
-          <div class="dashboard-stat">
-            <span class="stat-label">Intensity</span>
-            <span class="stat-value">{@intensity}%</span>
           </div>
         </div>
       </div>
